@@ -8,5 +8,5 @@ void EmgSensor::initialize()
 
 void EmgSensor::getValues()
 {
-  this->raw_emg += analogRead(this->PIN_READ);
+  this->raw_emg = analogRead(this->PIN_READ);
 }

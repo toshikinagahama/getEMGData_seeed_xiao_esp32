@@ -22,6 +22,7 @@ EmgSensor *emg_sensor = new EmgSensor();
 BatterySensor *bat_sensor = new BatterySensor();
 MyState state;
 uint16_t cnt = 0;
+uint16_t data[10] = {0};
 
 unsigned long time_start = micros();
 unsigned long time_end = micros();
@@ -34,19 +35,42 @@ int sampling_period_us;
 void sampling()
 {
   emg_sensor->getValues();
-  uint8_t val[8];
-  val[0] = 0x01; // 識別子1
-  val[1] = 0x01; // 識別子2
-  val[2] = (uint8_t)(cnt);
-  val[3] = (uint8_t)(cnt >> 8);
-  val[4] = (uint8_t)(cnt >> 16);
-  val[5] = (uint8_t)(cnt >> 24);
-  val[6] = (uint8_t)(emg_sensor->raw_emg);
-  val[7] = (uint8_t)(emg_sensor->raw_emg >> 8);
-  Serial.println(emg_sensor->raw_emg);
-  // sprintf(val, "data,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n", cnt, six_sensor->raw_acc[0][0], six_sensor->raw_acc[0][1], six_sensor->raw_acc[0][2], six_sensor->raw_gyro[0][0], six_sensor->raw_gyro[0][1], six_sensor->raw_gyro[0][2], six_sensor->raw_acc[1][0], six_sensor->raw_acc[1][1], six_sensor->raw_acc[1][2], six_sensor->raw_gyro[1][0], six_sensor->raw_gyro[1][1], six_sensor->raw_gyro[1][2]);
-  ble->notify(val, 8);
-  // ble->notify(val);
+  uint8_t val[26];
+
+  data[cnt % 10] = emg_sensor->raw_emg;
+  if (cnt % 10 == 0)
+  {
+
+    val[0] = 0x01; // 識別子1
+    val[1] = 0x01; // 識別子2
+    val[2] = (uint8_t)(cnt);
+    val[3] = (uint8_t)(cnt >> 8);
+    val[4] = (uint8_t)(cnt >> 16);
+    val[5] = (uint8_t)(cnt >> 24);
+    val[6] = (uint8_t)(data[(cnt - 9) % 10]);
+    val[7] = (uint8_t)(data[(cnt - 9) % 10] >> 8);
+    val[8] = (uint8_t)(data[(cnt - 8) % 10]);
+    val[9] = (uint8_t)(data[(cnt - 8) % 10] >> 8);
+    val[10] = (uint8_t)(data[(cnt - 7) % 10]);
+    val[11] = (uint8_t)(data[(cnt - 7) % 10] >> 8);
+    val[12] = (uint8_t)(data[(cnt - 6) % 10]);
+    val[13] = (uint8_t)(data[(cnt - 6) % 10] >> 8);
+    val[14] = (uint8_t)(data[(cnt - 5) % 10]);
+    val[15] = (uint8_t)(data[(cnt - 5) % 10] >> 8);
+    val[16] = (uint8_t)(data[(cnt - 4) % 10]);
+    val[17] = (uint8_t)(data[(cnt - 4) % 10] >> 8);
+    val[18] = (uint8_t)(data[(cnt - 3) % 10]);
+    val[19] = (uint8_t)(data[(cnt - 3) % 10] >> 8);
+    val[20] = (uint8_t)(data[(cnt - 2) % 10]);
+    val[21] = (uint8_t)(data[(cnt - 2) % 10] >> 8);
+    val[22] = (uint8_t)(data[(cnt - 1) % 10]);
+    val[23] = (uint8_t)(data[(cnt - 1) % 10] >> 8);
+    val[24] = (uint8_t)(data[(cnt - 0) % 10]);
+    val[25] = (uint8_t)(data[(cnt - 0) % 10] >> 8);
+    Serial.println(emg_sensor->raw_emg);
+    // sprintf(val, "data,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n", cnt, six_sensor->raw_acc[0][0], six_sensor->raw_acc[0][1], six_sensor->raw_acc[0][2], six_sensor->raw_gyro[0][0], six_sensor->raw_gyro[0][1], six_sensor->raw_gyro[0][2], six_sensor->raw_acc[1][0], six_sensor->raw_acc[1][1], six_sensor->raw_acc[1][2], six_sensor->raw_gyro[1][0], six_sensor->raw_gyro[1][1], six_sensor->raw_gyro[1][2]);
+    ble->notify(val, 26);
+  }
   // サンプリング分待つ
   while (time_end - time_start < sampling_period_us)
   {
