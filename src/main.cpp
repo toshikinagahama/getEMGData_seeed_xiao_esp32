@@ -14,6 +14,7 @@
 #define NUM_LEDS 1
 #define DATA_PIN D10
 #define SAMPLING_FREQUENCY 500
+#define BATTERY_WAIT_MILLISECOND 5000
 
 CRGB leds[NUM_LEDS];
 
@@ -101,7 +102,7 @@ void task(void *arg)
       sprintf(val, "%d", bat_sensor->level);
       ble->pBatteryCharacteristic->setValue(&bat_sensor->level, 1);
       ble->pBatteryCharacteristic->notify();
-      delay(1000);
+      delay(BATTERY_WAIT_MILLISECOND);
       break;
     }
   }
@@ -183,6 +184,7 @@ void setup()
   sprintf(char_version, "%d.%d.%d", EEPROM.readByte(ADDRESS_MAJOR_VERSION), EEPROM.readByte(ADDRESS_MINOR_VERSION), EEPROM.readByte(ADDRESS_REVISION_VERSION));
   SYS.DEVICE_VERSION = char_version;
   Serial.println(SYS.DEVICE_VERSION.c_str());
+  setCpuFrequencyMhz(80);
   ble->initialize();
   bat_sensor->initialize();
   emg_sensor->initialize();
