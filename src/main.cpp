@@ -22,7 +22,7 @@ MyBLE *ble = new MyBLE();
 EmgSensor *emg_sensor = new EmgSensor();
 BatterySensor *bat_sensor = new BatterySensor();
 MyState state;
-uint16_t cnt = 0;
+uint32_t cnt = 0;
 uint16_t data[10] = {0};
 
 unsigned long time_start = micros();
